@@ -1,0 +1,105 @@
+Remove Duplicates:
+
+psedocode:
+posts = Post.all.uniq
+
+SQL:
+SELECT title
+FROM post
+GROUP BY title
+HAVING COUNT(*) < 2;
+
+
+Filter - Inequalities
+
+pseudocode:
+popular = []
+Post.all.each do |post|
+ popular.push(post) if post.comments.length > 2
+end
+
+SQL:
+SELECT title
+FROM Posts
+GROUP BY comments
+HAVING COUNT(comments) > 2
+
+Filter - Pattern matching
+Movie.like("THE%")
+
+SELECT title
+FROM movies
+WHERE title LIKE 'The%'
+
+
+Filter - Ranges
+Post.where (rating > 90 || rating < 70)
+
+SELECT title
+FROM movies
+WHERE rating > 90
+OR rating < 70
+
+Filter - Boolean
+Post.where (rating = 90)
+
+SELECT title
+FROM movies
+WHERE rating = 90
+
+
+Post.where (rating != 90)
+SELECT title
+FROM movies
+WHERE rating <> 90
+
+Sorting
+Movie.rating.asc
+
+SELECT title
+FROM Movies
+ORDER BY rating ASC
+
+Limit number of records returned
+Movies.first(5)
+
+SELECT title
+FROM Movies
+LIMIT 5
+
+Group Records Into Sections
+
+Movies.group(genre)
+
+SELECT title
+FROM Movies
+GROUP BY genre
+
+Use Aggregate Functions
+Movies.sum(rating)
+Movies.avg(rating)
+
+SELECT avg(rating)
+FROM Movies
+
+Join Tables
+
+movies.join(reviews, movie_id)
+
+SELECT Movie.title
+FROM Movie
+LEFT OUTER JOIN Reviews
+ON Movie.id = Reviews.movie_id
+
+join(reviews, movies, movie_id)
+
+SELECT Movie.title
+FROM Movie
+INNER JOIN Reviews
+ON Movie.id = Reviews.movie_id
+
+movies.cross(theatres)
+
+SELECT title
+FROM Movie
+CROSS JOIN Theatres
