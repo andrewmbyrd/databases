@@ -1,0 +1,32 @@
+1. A Ruby Gem is a packaged set of instructions that can be shared and re-used across multiple applications. The gem is hosted on rubygems.org
+so that anyone with a Ruby development environment may access it. A Gem is useful across applications in the same way that a function is useful
+within an application. A function allow you to execute a set of instructions simply by calling the function rather than having to re-write the
+steps of the function multiple times. Similarly, a Gem that, say, allows you access to a database can be implemented once, and then all
+the functionality within that gem is available for use for your own applications and for other people to consume.
+
+2. Lazy loading is a strategy by which calculations are performed only when they are needed. For example, if I have a button on a web page that
+plays a sound, lazy loading would only load the sound file when the button is clicked. Eager loading, by contrast, would load the sound file
+at the same time the page is loaded. That way, the sound file will be ready to go when the user clicks it.
+
+3. CREATE TABLE enters a new table into the database. It is necessary to CREATE TABLE before any other operations can be done with that table.
+Creating the table initializes it with all of the known columns and expected data types that will eventually fill the rows corresponding to
+those columns. INSERT INTO requires that the table already exists. INSERT INTO creates a _record_, or a row of data, that fills the columns
+that were previously defined by calling CREATE TABLE.
+
+4. `Extend` is a ruby method that can be applied to any object (notably included are modules and classes) that give that object access to the
+methods defined in the EXTENDED module as class methods. So if I have a module called Mammal with a method called speak that puts "sound", I can
+make a class called Dog that EXTENDS MAMMAL. I can then do Dog.speak and that will give me "sound". If I said fido = Dog.new, and then did
+fido.speak, it wouldn't work because fido isn't a class, but an INSTANCE of a class. Include, then, makes it such that methods ARE actually
+available as instance methods. So if Dog includes Mammal, then fido.speak would work.
+So include is necessary when instances of the including odule are to be created.
+
+5. Persistence needs to have instance methods because each table is going to be an INSTANCE of a BlocRecord. They each need to be saved individually,
+so the save method needs to be applied to instances, not the class.
+
+6. The SQL for Jar Jar Binks would look like
+UPDATE character
+SET character_name = "Jar-Jar Binks", star_rating = 1
+WHERE id = 1
+
+7. @entries doesn't return anything because that instance variable was never created. We'll need to have BlocRecord::Base have an instance variable
+called @entries to fix this.

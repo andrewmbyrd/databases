@@ -16,6 +16,21 @@ module BlocRecord
        string.downcase
     end
 
+    def camelize(snake_word)
+      word = ""
+      for i in 0...snake_word.length
+        if snake_word[i-1] =="_"
+          word += snake_word[i].capitalize
+        elsif snake_word[i] != "_"
+          word += snake_word[i]
+        end
+      end
+
+      #optionally capitalize the first letter of the returned word
+      #word.capitalize!
+      word
+    end
+
     def sql_strings(value)
        case value
        when String
