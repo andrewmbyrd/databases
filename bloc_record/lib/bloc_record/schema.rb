@@ -4,7 +4,7 @@ require 'bloc_record/utility'
 module Schema
   def table
      BlocRecord::Utility.underscore(name)
-   end
+  end
 
    def schema
      unless @schema
@@ -26,7 +26,8 @@ module Schema
 
    def count
      connection.execute(<<-SQL)[0][0]
-       SELECT COUNT(*) FROM #{table}
+       SELECT COUNT(*)
+       FROM #{table}
      SQL
    end
 

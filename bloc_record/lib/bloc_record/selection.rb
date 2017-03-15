@@ -12,12 +12,12 @@ module Selection
    end
 
    def find_by(attribute, value)
-     rows = connection.get_rows <<-SQL
+     rows = connection.execute <<-SQL
         SELECT #{columns.join ","} FROM #{table}
         WHERE attribute = value
       SQL
 
-      data = Hash(columns.zip(rows))
+      data = Hash[columns.zip(rows)]
       new(data)
    end
 end

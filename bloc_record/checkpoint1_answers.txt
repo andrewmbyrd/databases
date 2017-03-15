@@ -16,12 +16,14 @@ that were previously defined by calling CREATE TABLE.
 4. `Extend` is a ruby method that can be applied to any object (notably included are modules and classes) that give that object access to the
 methods defined in the EXTENDED module as class methods. So if I have a module called Mammal with a method called speak that puts "sound", I can
 make a class called Dog that EXTENDS MAMMAL. I can then do Dog.speak and that will give me "sound". If I said fido = Dog.new, and then did
-fido.speak, it wouldn't work because fido isn't a class, but an INSTANCE of a class. Include, then, makes it such that methods ARE actually
-available as instance methods. So if Dog includes Mammal, then fido.speak would work.
-So include is necessary when instances of the including odule are to be created.
+fido.speak, it wouldn't work because fido isn't a class, but an INSTANCE of a class (a non-class object).
+Include, then, makes it such that methods ARE actually available as instance methods. So if Dog includes Mammal, then fido.speak would work.
+So include is necessary when individual instances of the class need to have access to the methods. `Extend` essentially makes the extended
+module/class act like a library. Methods from it can be called using ModuleOrClassName::ModuleOrClassName.method
 
-5. Persistence needs to have instance methods because each table is going to be an INSTANCE of a BlocRecord. They each need to be saved individually,
-so the save method needs to be applied to instances, not the class.
+5. Persistence needs to have instance methods because any table is going to be an INSTANCE of a BlocRecord (and, by extension, AddressBook).
+That table needs to be saved individually, so the save method needs to be applied to instances, not the class. The create method, however,
+does need to be a class method, because there is no instance before we create it!
 
 6. The SQL for Jar Jar Binks would look like
 UPDATE character
