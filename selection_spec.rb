@@ -11,7 +11,7 @@ RSpec.describe Entry, type: Class do
 
   describe "#find_each" do
     it "gets all instances of Entry" do
-      expect(Entry.find_each).to eq Enumerable
+      expect(BlocRecord::Base.first).to eq Enumerable
     end
   end
 
