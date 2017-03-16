@@ -100,7 +100,7 @@ module Selection
      row = connection.get_first_row <<-SQL
         SELECT #{columns.join ","}
         FROM #{table}
-        WHERE #{attribute} = #{BlocRecord::Utitlity.sql_strings(value)};
+        WHERE #{attribute} = #{BlocRecord::Utility.sql_strings(value)};
       SQL
 
       data = Hash[columns.zip(row)]
@@ -109,44 +109,32 @@ module Selection
 
   #assignment problem. We make start and batch_size optional arguments
   def find_each(start = nil, batch_size = nil)
-    #if we have both arguments, we want to grab every record from the provided start ID up to start + batch_size
-    #set rows equal to the query.
+    #we have various calls depending on which arguments we are given. We want to grab the group yielded by find_in_batches
+    #and give each record back to the user
     if start && batch_size
-      finish = start + batch_size
-      range = []
-      for i in start..finish
-        range << i
+      find_in_batches(start, batch_size) do |records|
+        records.each {|record| yield record}
       end
-      rows = connection.execute <<-SQL
-        SELECT *
-        FROM #{table}
-        WHERE id IN (#{range.join(",")})
-        ORDER BY id;
-      SQL
-    #if neither arguments is given we put the entire table into rows
+
     elsif !start && !batch_size
-      rows = connection.execute <<-SQL
-        SELECT *
-        FROM #{table}
-        ORDER BY id;
-      SQL
-    #if one argument is provided but not the other, then we raise an error
+      find_in_batches(1, 500) do |records|
+        records.each {|record| yield record}
+      end
+
+    elsif start
+      find_in_batches(start, 500) do |records|
+        records.each {|record| yield record}
+      end
     else
-      raise ArgsError "Wrong Number of Arguments given"
+      find_in_batches(1, batch_size) do |records|
+        records.each {|record| yield record}
+      end
+
     end
 
-    #records will be an array of Hash objects
-    records = rows_to_array(rows)
-
-    #yield every record to the user to perform their block on
-    for i in 0...records.length
-      yield records[i]
-    end
   end
 
-  #it looks like this just does one step less than the method above. don't iterate through `records` and yield each one,
-  #just yield the entire array of objects.
-  #start and batch_size are both required in this one
+  #this will return a grouping of records, and continue to do so until the end of the
   def find_in_batches(start, batch_size)
     finish = start + batch_size
     range = []
@@ -161,8 +149,28 @@ module Selection
     SQL
 
     records = rows_to_array(rows)
+    while records.any?
+      yield records
 
-    yield records
+      break if records.size < batch_size
+
+      start = finish + 1
+
+      finish = start + batch_size
+      range = []
+      for i in start..finish
+        range << i
+      end
+      rows = connection.execute <<-SQL
+        SELECT *
+        FROM #{table}
+        WHERE id IN (#{range.join(",")})
+        ORDER BY id;
+      SQL
+
+      records = rows_to_array(rows)
+    end
+
   end
 
   private
