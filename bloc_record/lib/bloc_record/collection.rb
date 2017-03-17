@@ -8,8 +8,10 @@ module BlocRecord
       self.any? self.first.class.update(ids, updates) : false
     end
 
+    #we already have all of the elements from the initial where clause in this array: self
+    #so just return a random element from self
     def take
-      self.first.class.take_one
+      self.sample
     end
 
     #specification is a hash
