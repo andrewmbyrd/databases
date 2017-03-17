@@ -63,7 +63,9 @@ module Selection
       when Symbol
         order << arg.to_s
       when Hash
-        order << "#{arg.keys[0].to_s} #{arg.values[0].to_s}"
+        arg.keys.each do |key|
+          order << "#{key.to_s} #{arg[key].to_s}"
+        end
       end
     end
 
