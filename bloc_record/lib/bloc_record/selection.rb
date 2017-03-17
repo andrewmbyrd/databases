@@ -53,11 +53,22 @@ module Selection
   end
 
   def order(*args)
-    if args.count > 1
-      order = args.join(",")
-    else
-      order = args.first.to_s
+    order = []
+
+    #convert everything to the proper string and put it in the array
+    args.each do |arg|
+      case arg
+      when String
+        order << arg
+      when Symbol
+        order << arg.to_s
+      when Hash
+        order << "#{arg.keys[0].to_s} #{arg.values[0].to_s}"
+      end
     end
+
+    #join that with commas to make the proper sequel join statement
+    order = order.join(",")
 
     rows = connection.execute <<-SQL
       SELECT *
@@ -90,6 +101,15 @@ module Selection
            FROM #{table}
            INNER JOIN #{args.first} ON #{args.first}.#{table}_id = #{table}.id;
          SQL
+      #this now handles the nested association mentioned in the assignment
+       when Hash
+         rows = connection.execute <<-SQL
+          SELECT *
+          FROM #{table}
+          INNER JOIN #{args.first.keys.first} ON #{args.first.keys.first}.#{table}_id = #{table}.id
+          INNER JOIN #{args.first.values.first} ON #{args.first.values.first}.#{args.first.keys.first}_id = #{args.first.keys.first}.id;
+        SQL
+
        end
      end
 
