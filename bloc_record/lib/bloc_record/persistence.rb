@@ -101,21 +101,47 @@ module Persistence
       true
     end
 
-    def destroy_all(conditions_hash=nil)
-      if conditions_hash && !conditions_hash.empty?
-         conditions_hash = BlocRecord::Utility.convert_keys(conditions_hash)
-         conditions = conditions_hash.map {|key, value| "#{key}=#{BlocRecord::Utility.sql_strings(value)}"}.join(" and ")
+    #use the splat operator to turn any arguments into an array
+    def destroy_all(*conditions_argument)
+      #if the array length is > 1, then the function call intended to use a prepared statement
+      #to execute the SQL. Set up the expression as the string at index 0, and all of the values
+      #are the strings in the remaining indices
+      if conditions_argument.length > 1
+        expression = conditions_argument.shift
+        params = conditions_argument
 
-         connection.execute <<-SQL
-           DELETE FROM #{table}
-           WHERE #{conditions};
-         SQL
-     else
+      #if our argument is of length 1, the problem was to incorporate a String. We also have to remember the case
+      #of a Hash from the checkpoint
+      elsif conditions_argument.length == 1
+        case conditions_argument.first
+
+        when Hash
+          conditions_hash = BlocRecord::Utility.convert_keys(conditions_hash)
+          expression = conditions_hash.map {|key, value| "#{key}=#{BlocRecord::Utility.sql_strings(value)}"}.join(" and ")
+
+        when String
+          expression = conditions_argument.first
+        end
+      #this `else` means our conditions_argument is empty. delete everything and return true
+      else
         connection.execute <<-SQL
           DELETE FROM #{table}
         SQL
-     end
-     
+        return true
+      end
+
+      #now if there was anything provided to the conditions_argument, we have expression and possibly params established
+      #we can prepare the SQL statement
+      sql = <<-SQL
+        DELETE FROM #{table}
+        WHERE #{expression}
+      SQL
+
+      #if params were provided with an array, we have to do connection.execute. This statement also seems to work if
+      #params is nil
+      connection.execute(sql, params)
+      return true
+
     end
 
   end
