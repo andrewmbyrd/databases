@@ -1,5 +1,5 @@
 include RSpec
-require 'bloc_record/base'
+require_relative 'bloc_record/lib/bloc_record/base'
 require 'bloc_record'
 require_relative 'address-bloc-1/models/entry'
 
@@ -9,7 +9,7 @@ RSpec.describe Entry do
 
   describe "#find_each" do
     it "gets all instances of Entry" do
-      puts Entry.find(1).name
+       expect(Entry.first.name).to eq "Foo One"
     end
   end
 
