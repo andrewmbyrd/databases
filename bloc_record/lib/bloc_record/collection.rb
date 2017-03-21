@@ -22,13 +22,24 @@ module BlocRecord
       #we already have the complete list of what could be returned by further specifications
       #here, we can loop through each Entry in SELF and see if its VALUE at KEY matches. if it does,
       #append it to response
-      key = specification.keys.first
+      key = specification.keys.first.to_s
       value = specification.values.first
       self.each do |entry|
         response << entry if entry.key == value
       end
 
       response.empty? ? nil : response
+    end
+
+    #condition is of type Hash
+    def not(condition)
+      attribute = condition.keys.first.to_s
+      value = condition.values.first
+      self.each do |record|
+        self.delete(record) if record.attribute == value
+      end
+
+      return self
     end
 
   end
