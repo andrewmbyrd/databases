@@ -62,7 +62,7 @@ module Selection
     rows_to_array(rows)
   end
 
-  def find(*ids)
+  #def find(*ids)
     #error handling/input validation
     ids.each_with_index do |id, index|
       raise IDError, "ID at position #{index} is not a number" unless id.is_a?(Numeric) && id > 0
@@ -77,7 +77,7 @@ module Selection
         WHERE id IN (#{ids.join(",")});
       SQL
 
-      rows_to_array(rows)
+      #rows_to_array(rows)
     end
 
   end
