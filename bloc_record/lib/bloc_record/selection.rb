@@ -62,7 +62,7 @@ module Selection
     rows_to_array(rows)
   end
 
-  #def find(*ids)
+  def find(*ids)
     #error handling/input validation
     ids.each_with_index do |id, index|
       raise IDError, "ID at position #{index} is not a number" unless id.is_a?(Numeric) && id > 0
@@ -77,14 +77,14 @@ module Selection
         WHERE id IN (#{ids.join(",")});
       SQL
 
-      #rows_to_array(rows)
+      rows_to_array(rows)
     end
 
   end
 
     def find_one(id)
       #error handling/input validation
-      raise IDError "Invalid input" unless num.is_a?(Numeric) && num > 0
+      raise IDError "Invalid input" unless id.is_a?(Numeric) && id > 0
 
       row = connection.get_first_row <<-SQL
         SELECT #{columns.join ","} FROM #{table}
@@ -97,10 +97,11 @@ module Selection
 
 
   def find_by(attribute, value)
+    att = attribute.to_s
      row = connection.get_first_row <<-SQL
         SELECT #{columns.join ","}
         FROM #{table}
-        WHERE #{attribute} = #{BlocRecord::Utility.sql_strings(value)};
+        WHERE #{att} = #{BlocRecord::Utility.sql_strings(value)};
       SQL
 
       data = Hash[columns.zip(row)]
@@ -135,8 +136,8 @@ module Selection
   end
 
   #this will return a grouping of records, and continue to do so until the end of the
-  def find_in_batches(start, batch_size)
-    finish = start + batch_size
+  def find_in_batches(start, batch_size=500)
+    finish = start + batch_size - 1
     range = []
     for i in start..finish
       range << i
@@ -149,9 +150,11 @@ module Selection
     SQL
 
     records = rows_to_array(rows)
-    while records.any?
-      yield records
 
+
+    while records.any?
+
+      yield records
       break if records.size < batch_size
 
       start = finish + 1
@@ -161,6 +164,8 @@ module Selection
       for i in start..finish
         range << i
       end
+
+      puts "range!: #{range}"
       rows = connection.execute <<-SQL
         SELECT *
         FROM #{table}
@@ -169,7 +174,11 @@ module Selection
       SQL
 
       records = rows_to_array(rows)
+      records.each do |record|
+        puts "in batches! #{record.name}"
+      end
     end
+
 
   end
 
